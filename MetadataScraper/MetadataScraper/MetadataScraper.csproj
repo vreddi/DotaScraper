@@ -51,15 +51,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Hero.cs" />
-    <Compile Include="LuisEntry.cs" />
-    <Compile Include="OpenDotaHero.cs" />
+    <Compile Include="DataModels\Item.cs" />
+    <Compile Include="DataModels\Hero.cs" />
+    <Compile Include="DataModels\LuisEntry.cs" />
+    <Compile Include="DataModels\OpenDotaHero.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scraper.cs" />
-    <Compile Include="Skill.cs" />
-    <Compile Include="StatEffect.cs" />
-    <Compile Include="Talent.cs" />
+    <Compile Include="DataModels\Skill.cs" />
+    <Compile Include="DataModels\StatEffect.cs" />
+    <Compile Include="DataModels\Talent.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

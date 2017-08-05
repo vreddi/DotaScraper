@@ -29,22 +29,34 @@ namespace MetadataScraper
 
         public static async Task<bool> AsyncMain()
         {
-            Console.WriteLine("Enter 1 to parse all hero data");
-            Console.WriteLine("Enter 2 to generate Luis hero data entries");
+            Console.WriteLine("Commands");
+            Console.WriteLine("1) Parse all hero data");
+            Console.WriteLine("2) Generate Luis hero data entries");
+            Console.WriteLine("3) Parse all item data");
 
-            var line = Console.ReadLine();
+            var cmd = Console.ReadLine();
 
-            if (line.Contains("1"))
+            switch (cmd)
             {
-                Console.WriteLine("Refresh hero data from DotaBuff? (y/n): ");
-                line = Console.ReadLine();
+                case "1":
+                    Console.WriteLine("Refresh hero data from DotaBuff? (y/n): ");
+                    cmd = Console.ReadLine();
 
-                var refreshData = line.Contains("y");
-                await ParseHeroData(refreshData);
-            }
-            else if (line.Contains("2"))
-            {
-                await CreateLuisHeroData();
+                    var refreshData = cmd.Contains("y");
+                    await ParseHeroData(refreshData);
+                    break;
+
+                case "2":
+                    await CreateLuisHeroData();
+                    break;
+
+                case "3":
+                    await ParseItemData();
+                    break;
+
+                default:
+                    Console.WriteLine("Could not find anything");
+                    break;
             }
 
             return true;
@@ -76,6 +88,17 @@ namespace MetadataScraper
             var heroes = await GetOpenDotaHeroes(overrideOldData);
 
             WriteHeroFiles(heroes);
+        }
+
+        private static async Task ParseItemData(bool overrideOldData = false)
+        {
+            var items = await Scraper.GetAllItems();
+
+            foreach (var item in items) {
+                Console.WriteLine(item.Name + " processed.");
+            }
+            Console.ReadLine();
+            //WriteHeroFiles(heroes);
         }
 
         private static void WriteHeroFiles(List<OpenDotaHero> heroes)

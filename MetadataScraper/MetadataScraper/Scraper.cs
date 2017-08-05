@@ -192,5 +192,35 @@ namespace MetadataScraper
 
             return skill;
         }
+
+        public static async Task<List<Item>> GetAllItems()
+        {
+            int itemRank = 1;
+            var htmlWeb = new HtmlWeb();
+            var dotabuffDoc = htmlWeb.Load(DotabuffEndpoint + "items?date=week");
+            List<Item> items = new List<Item>();
+
+            var query = from table in dotabuffDoc.DocumentNode.SelectNodes("//table").Cast<HtmlNode>()
+                        from body in table.SelectNodes("tbody").Cast<HtmlNode>()
+                        from row in body.SelectNodes("tr").Cast<HtmlNode>()
+                        select new { ItemRow = row };
+
+            foreach (var element in query)
+            {
+                var ItemRowCells = element.ItemRow.SelectNodes("td");
+                var item = new Item();
+
+                item.PopularityRank = itemRank;
+                item.Name = ItemRowCells.ElementAt<HtmlNode>(0).GetAttributeValue("data-value", null);
+                item.TimesUsed = Convert.ToInt64(ItemRowCells.ElementAt<HtmlNode>(2).GetAttributeValue("data-value", null));
+                item.UseRate = Convert.ToDouble(ItemRowCells.ElementAt<HtmlNode>(3).GetAttributeValue("data-value", null));
+                item.WinRate = Convert.ToDouble(ItemRowCells.ElementAt<HtmlNode>(4).GetAttributeValue("data-value", null));
+
+                items.Add(item);
+                itemRank++;
+            }
+
+            return items;
+        }
     }
 }
