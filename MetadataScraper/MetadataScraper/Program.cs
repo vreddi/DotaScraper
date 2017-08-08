@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Threading;
 
 namespace MetadataScraper
 {
@@ -22,17 +23,19 @@ namespace MetadataScraper
 
         private static readonly string LuisHeroEntriesPath = @"C:\Repos\DotaBot\Metadata\Luis\HeroEntries.json";
 
+        private static readonly string ItemsMetadataItemDirectory = @"D:\Github\DotaScraper";
+
+        private static readonly string ItemsMetadataItemFormat = @"D:\Github\DotaScraper\{0}.json";
+
         public static void Main(string[] args)
         {
+            ScraperMenu.ShowMenu();
             var success = AsyncMain().Result;
         }
 
         public static async Task<bool> AsyncMain()
         {
-            Console.WriteLine("Commands");
-            Console.WriteLine("1) Parse all hero data");
-            Console.WriteLine("2) Generate Luis hero data entries");
-            Console.WriteLine("3) Parse all item data");
+            ScraperMenu.ShowMenu();
 
             var cmd = Console.ReadLine();
 
@@ -96,10 +99,11 @@ namespace MetadataScraper
 
             foreach (var item in items) {
                 Console.WriteLine(item.Name + " processed.");
+                Console.Write(item.SourceLink);
             }
-            Console.ReadLine();
-            //WriteHeroFiles(heroes);
-        }
+
+            WriteItemFiles(items)
+;        }
 
         private static void WriteHeroFiles(List<OpenDotaHero> heroes)
         {
@@ -107,6 +111,14 @@ namespace MetadataScraper
             {
                 File.WriteAllText(string.Format(HeroesMetadataHeroFormat, hero.name),
                     JsonConvert.SerializeObject(hero, jsonSerializerSettings));
+            }
+        }
+
+        private static void WriteItemFiles(List<Item> items) {
+            foreach (var item in items) {
+                File.WriteAllText(string.Format(ItemsMetadataItemFormat, item.LocalizedName),
+                        JsonConvert.SerializeObject(item, jsonSerializerSettings)
+                    );
             }
         }
 

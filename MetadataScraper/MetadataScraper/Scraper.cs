@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 
@@ -212,12 +212,135 @@ namespace MetadataScraper
 
                 item.PopularityRank = itemRank;
                 item.Name = ItemRowCells.ElementAt<HtmlNode>(0).GetAttributeValue("data-value", null);
+                item.LocalizedName = item.Name.ToLower().Replace(" ", "-").Replace("'", "").Replace("(", "").Replace(")", "");
+                item.SourceLink = DotabuffEndpoint + "items/" + item.LocalizedName;
                 item.TimesUsed = Convert.ToInt64(ItemRowCells.ElementAt<HtmlNode>(2).GetAttributeValue("data-value", null));
                 item.UseRate = Convert.ToDouble(ItemRowCells.ElementAt<HtmlNode>(3).GetAttributeValue("data-value", null));
                 item.WinRate = Convert.ToDouble(ItemRowCells.ElementAt<HtmlNode>(4).GetAttributeValue("data-value", null));
 
+                item.Stats = new List<Stat>();
+
+                Console.WriteLine("Parsing " + item.Name + "...");
+
+                var statNodes = new List<HtmlNode>();
+
+                var dotaBuffItemDoc = htmlWeb.Load(item.SourceLink);
+
+                bool docStatsExists = dotaBuffItemDoc.DocumentNode.SelectNodes("//article")[0].SelectNodes("//div[@class = 'stats']") != null;
+                IEnumerable<HtmlNode> stats = new List<HtmlNode>();
+
+                if (docStatsExists) {
+                    stats = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
+                            from statDiv in article.SelectNodes("//div[@class = 'stats']")
+                            from stat in statDiv.SelectNodes("div[contains(@class, 'stat')]")
+                            select stat;
+                }
+
+                IEnumerable<HtmlNode> descriptions = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
+                                                     from description in article.SelectNodes("//div[@class = 'description']").Cast<HtmlNode>()
+                                                     select description;
+
+                // Populate Stats
+                foreach (var stat in stats) {
+
+                    if (itemRank > 22) {
+                        return items;
+                    }
+                    var itemStat = new Stat();
+                    var docValue = stat.SelectSingleNode("span[@class = 'value']").InnerText;
+                    itemStat.Name = stat.SelectSingleNode("span[@class = 'label']").InnerText;
+
+                    string statDivClasses = stat.GetAttributeValue("class", null);
+
+                    if (statDivClasses != null) {
+                        if (statDivClasses.Contains("attribute")){
+                            itemStat.StatType = StatType.Attribute;
+                        }
+                        else if (statDivClasses.Contains("effect")) {
+                            itemStat.StatType = StatType.Effect;
+                        }
+                    }
+
+                    if (docValue.Contains("%"))
+                    {
+                        itemStat.ValueType = StatValueType.Percentage;
+                        itemStat.Value = Convert.ToInt16(docValue.Replace("%", ""));
+                    }
+                    else {
+                        itemStat.ValueType = StatValueType.Number;
+                        itemStat.Value = Convert.ToInt16(docValue.Replace(",", ""));
+                    }
+
+                    item.Stats.Add(itemStat);
+                }
+
+                // Populate descriptions
+                item.Descriptions = new List<ItemAbility>();
+                foreach (var childNode in descriptions.First().ChildNodes) {
+                    string classAttrValue = childNode.GetAttributeValue("class", null);
+
+                    if (classAttrValue != null) {
+                        ItemAbility ability = new ItemAbility();
+                        switch (classAttrValue) {
+                            case "description-block passive":
+                                ability.Type = ItemAbilityType.Passive;
+                                ability.Name = childNode.SelectSingleNode("div[@class = 'description-block-header']").InnerText.Replace("Passive: ", "");
+                                ability.Description = childNode.InnerText.Replace("Passive: " + ability.Name, "");
+                                item.Descriptions.Add(ability);
+                                break;
+
+                            case "description-block active":
+                                ability.Type = ItemAbilityType.Active;
+                                ability.Name = childNode.SelectSingleNode("div[@class = 'description-block-header']").InnerText.Replace("Active: ", "");
+                                ability.Description = childNode.InnerText.Replace("Active: " + ability.Name, "");
+                                item.Descriptions.Add(ability);
+                                break;
+
+                            case "description-block use":
+                                ability.Type = ItemAbilityType.Use;
+                                ability.Name = childNode.SelectSingleNode("div[@class = 'description-block-header']").InnerText.Replace("Use: ", "");
+                                ability.Description = childNode.InnerText.Replace("Use: " + ability.Name, "");
+                                item.Descriptions.Add(ability);
+                                break;
+
+                            case "cooldown-and-cost":
+                                HtmlNode coolDownDiv = childNode.SelectSingleNode("div[@class = 'cooldown']");
+                                HtmlNode manaCostDiv = childNode.SelectSingleNode("div[@class = 'manacost']");
+
+                                // Black King Bar (BKB) has multiple cool downs
+                                // TODO: Need a way to handle that
+                                if (item.LocalizedName == "black-king-bar") {
+                                    continue;
+                                }
+
+                                if (coolDownDiv != null) {
+                                    item.Descriptions.First().CoolDown = Convert.ToInt16(coolDownDiv.SelectSingleNode("span[@class = 'value']").InnerText);
+                                }
+
+                                if (manaCostDiv != null)
+                                {
+                                    item.Descriptions.First().ManaCost = Convert.ToInt16(manaCostDiv.SelectSingleNode("span[@class = 'value']").InnerText);
+                                }
+                                break;
+                        }
+                    }
+                }
+
+
+
                 items.Add(item);
                 itemRank++;
+
+                // Show progress bar and add some wait between querying each item document
+                using (var progress = new ProgressBar())
+                {
+                    for (int i = 0; i <= 100; i++)
+                    {
+                        progress.Report((double)i / 100);
+                        Thread.Sleep(20);
+                    }
+                }
+                Console.WriteLine("Done.");
             }
 
             return items;
