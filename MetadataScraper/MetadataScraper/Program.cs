@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Threading;
 
 namespace MetadataScraper
 {
@@ -22,29 +23,43 @@ namespace MetadataScraper
 
         private static readonly string LuisHeroEntriesPath = @"C:\Repos\DotaBot\Metadata\Luis\HeroEntries.json";
 
+        private static readonly string ItemsMetadataItemDirectory = @"D:\Github\DotaScraper";
+
+        private static readonly string ItemsMetadataItemFormat = @"D:\Github\DotaScraper\{0}.json";
+
         public static void Main(string[] args)
         {
+            ScraperMenu.ShowMenu();
             var success = AsyncMain().Result;
         }
 
         public static async Task<bool> AsyncMain()
         {
-            Console.WriteLine("Enter 1 to parse all hero data");
-            Console.WriteLine("Enter 2 to generate Luis hero data entries");
+            ScraperMenu.ShowMenu();
 
-            var line = Console.ReadLine();
+            var cmd = Console.ReadLine();
 
-            if (line.Contains("1"))
+            switch (cmd)
             {
-                Console.WriteLine("Refresh hero data from DotaBuff? (y/n): ");
-                line = Console.ReadLine();
+                case "1":
+                    Console.WriteLine("Refresh hero data from DotaBuff? (y/n): ");
+                    cmd = Console.ReadLine();
 
-                var refreshData = line.Contains("y");
-                await ParseHeroData(refreshData);
-            }
-            else if (line.Contains("2"))
-            {
-                await CreateLuisHeroData();
+                    var refreshData = cmd.Contains("y");
+                    await ParseHeroData(refreshData);
+                    break;
+
+                case "2":
+                    await CreateLuisHeroData();
+                    break;
+
+                case "3":
+                    await ParseItemData();
+                    break;
+
+                default:
+                    Console.WriteLine("Could not find anything");
+                    break;
             }
 
             return true;
@@ -78,12 +93,32 @@ namespace MetadataScraper
             WriteHeroFiles(heroes);
         }
 
+        private static async Task ParseItemData(bool overrideOldData = false)
+        {
+            var items = await Scraper.GetAllItems();
+
+            foreach (var item in items) {
+                Console.WriteLine(item.Name + " processed.");
+                Console.Write(item.SourceLink);
+            }
+
+            WriteItemFiles(items)
+;        }
+
         private static void WriteHeroFiles(List<OpenDotaHero> heroes)
         {
             foreach (var hero in heroes)
             {
                 File.WriteAllText(string.Format(HeroesMetadataHeroFormat, hero.name),
                     JsonConvert.SerializeObject(hero, jsonSerializerSettings));
+            }
+        }
+
+        private static void WriteItemFiles(List<Item> items) {
+            foreach (var item in items) {
+                File.WriteAllText(string.Format(ItemsMetadataItemFormat, item.LocalizedName),
+                        JsonConvert.SerializeObject(item, jsonSerializerSettings)
+                    );
             }
         }
 
