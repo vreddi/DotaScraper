@@ -243,9 +243,6 @@ namespace MetadataScraper
                 // Populate Stats
                 foreach (var stat in stats) {
 
-                    if (itemRank > 22) {
-                        return items;
-                    }
                     var itemStat = new Stat();
                     var docValue = stat.SelectSingleNode("span[@class = 'value']").InnerText;
                     itemStat.Name = stat.SelectSingleNode("span[@class = 'label']").InnerText;
@@ -268,7 +265,7 @@ namespace MetadataScraper
                     }
                     else {
                         itemStat.ValueType = StatValueType.Number;
-                        itemStat.Value = Convert.ToInt16(docValue.Replace(",", ""));
+                        itemStat.Value = Convert.ToDouble(docValue.Replace(",", ""));
                     }
 
                     item.Stats.Add(itemStat);
@@ -314,7 +311,7 @@ namespace MetadataScraper
                                 }
 
                                 if (coolDownDiv != null) {
-                                    item.Descriptions.First().CoolDown = Convert.ToInt16(coolDownDiv.SelectSingleNode("span[@class = 'value']").InnerText);
+                                    item.Descriptions.First().CoolDown = Convert.ToDouble(coolDownDiv.SelectSingleNode("span[@class = 'value']").InnerText);
                                 }
 
                                 if (manaCostDiv != null)
@@ -326,7 +323,11 @@ namespace MetadataScraper
                     }
                 }
 
+                var loreElement = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[@class = 'lore']");
 
+                if (loreElement != null) {
+                    item.Lore = loreElement.InnerText;
+                }
 
                 items.Add(item);
                 itemRank++;

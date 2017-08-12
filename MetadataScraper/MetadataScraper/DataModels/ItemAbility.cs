@@ -16,6 +16,6 @@
         
         public int ManaCost { get; set; }
         
-        public int CoolDown { get; set; }
+        public double CoolDown { get; set; }
     }
 }

@@ -23,9 +23,9 @@ namespace MetadataScraper
 
         private static readonly string LuisHeroEntriesPath = @"C:\Repos\DotaBot\Metadata\Luis\HeroEntries.json";
 
-        private static readonly string ItemsMetadataItemDirectory = @"D:\Github\DotaScraper";
+        private static readonly string ItemsMetadataItemDirectory = @"C:\Github\DotaScraper";
 
-        private static readonly string ItemsMetadataItemFormat = @"D:\Github\DotaScraper\{0}.json";
+        private static readonly string ItemsMetadataItemFormat = @"C:\Github\DotaScraper\{0}.json";
 
         public static void Main(string[] args)
         {
