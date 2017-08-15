@@ -1,4 +1,7 @@
-﻿namespace MetadataScraper
+﻿using System;
+using System.Collections.Generic;
+
+namespace MetadataScraper
 {
     public enum ItemAbilityType {
         Active,
@@ -16,6 +19,6 @@
         
         public int ManaCost { get; set; }
         
-        public double CoolDown { get; set; }
+        public List<double> CoolDown { get; set; }
     }
 }
