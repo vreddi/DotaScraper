@@ -304,14 +304,19 @@ namespace MetadataScraper
                                 HtmlNode coolDownDiv = childNode.SelectSingleNode("div[@class = 'cooldown']");
                                 HtmlNode manaCostDiv = childNode.SelectSingleNode("div[@class = 'manacost']");
 
-                                // Black King Bar (BKB) has multiple cool downs
-                                // TODO: Need a way to handle that
-                                if (item.LocalizedName == "black-king-bar") {
-                                    continue;
-                                }
-
                                 if (coolDownDiv != null) {
-                                    item.Descriptions.First().CoolDown = Convert.ToDouble(coolDownDiv.SelectSingleNode("span[@class = 'value']").InnerText);
+
+                                    HtmlNodeCollection spanValues = coolDownDiv.SelectSingleNode("span[@class = 'value']").SelectNodes("span");
+
+                                    if (spanValues != null) {
+                                        item.Descriptions.First().CoolDown = new List<double>();
+
+                                        foreach (HtmlNode spanValue in spanValues)
+                                        {
+                                            item.Descriptions.First().CoolDown.Add(Convert.ToDouble(spanValue.InnerText));
+                                        }
+
+                                    }                                  
                                 }
 
                                 if (manaCostDiv != null)
