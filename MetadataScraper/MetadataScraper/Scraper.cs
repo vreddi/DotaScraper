@@ -210,6 +210,10 @@ namespace MetadataScraper
                 var ItemRowCells = element.ItemRow.SelectNodes("td");
                 var item = new Item();
 
+                if (itemRank > 3) {
+                    return items;
+                }
+
                 item.PopularityRank = itemRank;
                 item.Name = ItemRowCells.ElementAt<HtmlNode>(0).GetAttributeValue("data-value", null);
                 item.LocalizedName = item.Name.ToLower().Replace(" ", "-").Replace("'", "").Replace("(", "").Replace(")", "");
@@ -239,6 +243,14 @@ namespace MetadataScraper
                 IEnumerable<HtmlNode> descriptions = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
                                                      from description in article.SelectNodes("//div[@class = 'description']").Cast<HtmlNode>()
                                                      select description;
+
+                HtmlNode toolTipHeader = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'tooltip-header')]");
+
+                string cost = toolTipHeader.SelectSingleNode("//span[@class = 'value']").InnerText.Replace(",", "");
+
+                if (cost != null) {
+                    item.Cost = Convert.ToInt16(cost);
+                }
 
                 // Populate Stats
                 foreach (var stat in stats) {
