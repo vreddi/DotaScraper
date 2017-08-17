@@ -210,10 +210,6 @@ namespace MetadataScraper
                 var ItemRowCells = element.ItemRow.SelectNodes("td");
                 var item = new Item();
 
-                if (itemRank > 3) {
-                    return items;
-                }
-
                 item.PopularityRank = itemRank;
                 item.Name = ItemRowCells.ElementAt<HtmlNode>(0).GetAttributeValue("data-value", null);
                 item.LocalizedName = item.Name.ToLower().Replace(" ", "-").Replace("'", "").Replace("(", "").Replace(")", "");
@@ -249,7 +245,12 @@ namespace MetadataScraper
                 string cost = toolTipHeader.SelectSingleNode("//span[@class = 'value']").InnerText.Replace(",", "");
 
                 if (cost != null) {
-                    item.Cost = Convert.ToInt16(cost);
+                    try {
+                        item.Cost = Convert.ToInt16(cost);
+                    }
+                    catch (Exception ex) {
+                        Console.WriteLine("Error: " + ex);
+                    }
                 }
 
                 // Populate Stats
