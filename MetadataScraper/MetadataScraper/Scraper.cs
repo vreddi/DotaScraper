@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Threading;
@@ -195,6 +196,9 @@ namespace MetadataScraper
 
         public static async Task<List<Item>> GetAllItems()
         {
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             int itemRank = 1;
             var htmlWeb = new HtmlWeb();
             var dotabuffDoc = htmlWeb.Load(DotabuffEndpoint + "items?date=week");
@@ -209,6 +213,7 @@ namespace MetadataScraper
             {
                 var ItemRowCells = element.ItemRow.SelectNodes("td");
                 var item = new Item();
+                ItemShopAvailability shops = new ItemShopAvailability();
 
                 item.PopularityRank = itemRank;
                 item.Name = ItemRowCells.ElementAt<HtmlNode>(0).GetAttributeValue("data-value", null);
@@ -239,6 +244,16 @@ namespace MetadataScraper
                 IEnumerable<HtmlNode> descriptions = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
                                                      from description in article.SelectNodes("//div[@class = 'description']").Cast<HtmlNode>()
                                                      select description;
+
+                IEnumerable<HtmlNode> shopNodes = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
+                                                  from shop in article.SelectNodes("//div[@class = 'shop']").Cast<HtmlNode>()
+                                                  select shop;
+
+                foreach (var shopNode in shopNodes) {
+                    shops.DetermineShopBasedOnText(shopNode.InnerText);
+                }
+
+                item.Shops = shops;
 
                 HtmlNode toolTipHeader = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'tooltip-header')]");
 

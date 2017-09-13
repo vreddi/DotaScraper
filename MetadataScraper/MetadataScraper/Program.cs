@@ -30,7 +30,7 @@ namespace MetadataScraper
         public static void Main(string[] args)
         {
             ScraperMenu.ShowMenu();
-            var success = AsyncMain().Result;
+             var success = AsyncMain().Result;
         }
 
         public static async Task<bool> AsyncMain()
