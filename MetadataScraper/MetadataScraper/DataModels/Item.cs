@@ -32,6 +32,8 @@ namespace MetadataScraper
 
         public string Image { get; set; }
 
+        public ItemShopAvailability Shops { get; set; }
+
         public List<string> Aliases { get; set; }
 
     }

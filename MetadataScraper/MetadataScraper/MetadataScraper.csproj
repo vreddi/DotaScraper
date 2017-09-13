@@ -54,6 +54,7 @@
     <Compile Include="DataModels\Item.cs" />
     <Compile Include="DataModels\Hero.cs" />
     <Compile Include="DataModels\ItemAbility.cs" />
+    <Compile Include="DataModels\ItemShopAvailability.cs" />
     <Compile Include="DataModels\LuisEntry.cs" />
     <Compile Include="DataModels\OpenDotaHero.cs" />
     <Compile Include="DataModels\Stat.cs" />
