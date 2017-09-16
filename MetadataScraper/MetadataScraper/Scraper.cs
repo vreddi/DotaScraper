@@ -232,7 +232,10 @@ namespace MetadataScraper
                 var dotaBuffItemDoc = htmlWeb.Load(item.SourceLink);
 
                 bool docStatsExists = dotaBuffItemDoc.DocumentNode.SelectNodes("//article")[0].SelectNodes("//div[@class = 'stats']") != null;
+                bool shopInfoExists = dotaBuffItemDoc.DocumentNode.SelectNodes("//article")[0].SelectNodes("//div[@class = 'shop']") != null;
+
                 IEnumerable<HtmlNode> stats = new List<HtmlNode>();
+                IEnumerable<HtmlNode> shopNodes = new List<HtmlNode>();
 
                 if (docStatsExists) {
                     stats = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
@@ -245,15 +248,19 @@ namespace MetadataScraper
                                                      from description in article.SelectNodes("//div[@class = 'description']").Cast<HtmlNode>()
                                                      select description;
 
-                IEnumerable<HtmlNode> shopNodes = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
-                                                  from shop in article.SelectNodes("//div[@class = 'shop']").Cast<HtmlNode>()
-                                                  select shop;
+                // Get Shop Information
+                if (shopInfoExists) {
+                    shopNodes = from article in dotaBuffItemDoc.DocumentNode.SelectNodes("//div[@class = 'portable-show-item-details-default']").Cast<HtmlNode>()
+                                from shop in article.SelectNodes("//div[@class = 'shop']").Cast<HtmlNode>()
+                                select shop;
 
-                foreach (var shopNode in shopNodes) {
-                    shops.DetermineShopBasedOnText(shopNode.InnerText);
+                    foreach (var shopNode in shopNodes)
+                    {
+                        shops.DetermineShopBasedOnText(shopNode.InnerText);
+                    }
+
+                    item.Shops = shops;
                 }
-
-                item.Shops = shops;
 
                 HtmlNode toolTipHeader = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'tooltip-header')]");
 
@@ -264,7 +271,9 @@ namespace MetadataScraper
                         item.Cost = Convert.ToInt16(cost);
                     }
                     catch (Exception ex) {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
                         Console.WriteLine("Error: " + ex);
+                        Console.ResetColor();
                     }
                 }
 
