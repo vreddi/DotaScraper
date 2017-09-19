@@ -262,6 +262,20 @@ namespace MetadataScraper
                     item.Shops = shops;
                 }
 
+                // Get Notes
+                HtmlNode notes = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'notes')]");
+
+                // Populate notes
+                if (notes != null) {
+                    IEnumerable<HtmlNode> notes_p = notes.SelectNodes("p");
+
+                    item.Notes = new List<string>();
+
+                    foreach (HtmlNode p in notes_p) {
+                        item.Notes.Add(p.InnerText);
+                    }
+                }
+
                 HtmlNode toolTipHeader = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'tooltip-header')]");
 
                 string cost = toolTipHeader.SelectSingleNode("//span[@class = 'value']").InnerText.Replace(",", "");
