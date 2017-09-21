@@ -36,5 +36,20 @@ namespace MetadataScraper
 
         public List<string> Aliases { get; set; }
 
+        public List<string> BuiltFrom { get; set; }
+
+        public List<string> BuildInto { get; set; }
+
+
+        /// <summary>
+        /// Given the name of the item, this converts and returns the localized-name of the
+        /// item.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static string ConvertItemNameToLocalizedName(string name)
+        {
+            return name.ToLower().Replace(" ", "-").Replace("'", "").Replace("(", "").Replace(")", "").Replace("&#39;", "");
+        }
     }
 }

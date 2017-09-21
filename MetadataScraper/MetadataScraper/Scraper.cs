@@ -217,7 +217,7 @@ namespace MetadataScraper
 
                 item.PopularityRank = itemRank;
                 item.Name = ItemRowCells.ElementAt<HtmlNode>(0).GetAttributeValue("data-value", null);
-                item.LocalizedName = item.Name.ToLower().Replace(" ", "-").Replace("'", "").Replace("(", "").Replace(")", "");
+                item.LocalizedName = Item.ConvertItemNameToLocalizedName(item.Name);
                 item.SourceLink = DotabuffEndpoint + "items/" + item.LocalizedName;
                 item.TimesUsed = Convert.ToInt64(ItemRowCells.ElementAt<HtmlNode>(2).GetAttributeValue("data-value", null));
                 item.UseRate = Convert.ToDouble(ItemRowCells.ElementAt<HtmlNode>(3).GetAttributeValue("data-value", null));
@@ -262,6 +262,43 @@ namespace MetadataScraper
                     item.Shops = shops;
                 }
 
+                // Get Build From
+                HtmlNode buildsFrom = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'item-builds-from')]");
+
+                if(buildsFrom != null) {
+                    item.BuiltFrom = new List<string>();
+                    IEnumerable<HtmlNode> itemImgs = buildsFrom.SelectNodes(".//img");
+
+                    foreach (HtmlNode itemImg in itemImgs) {
+
+                        if (itemImg != null) {
+                            item.BuiltFrom.Add(Item.ConvertItemNameToLocalizedName(
+                                itemImg.GetAttributeValue("alt", "")
+                            ));
+                        }
+                    }                
+                }
+
+                // Get Build Into
+                HtmlNode buildsInto = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'item-builds-into')]");
+
+                if (buildsInto != null)
+                {
+                    item.BuildInto = new List<string>();
+                    IEnumerable<HtmlNode> itemImgs = buildsInto.SelectNodes(".//img");
+
+                    foreach (HtmlNode itemImg in itemImgs)
+                    {
+
+                        if (itemImg != null)
+                        {
+                            item.BuildInto.Add(Item.ConvertItemNameToLocalizedName(
+                                itemImg.GetAttributeValue("alt", "")
+                            ));
+                        }
+                    }
+                }
+
                 // Get Notes
                 HtmlNode notes = dotaBuffItemDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'notes')]");
 
@@ -272,7 +309,7 @@ namespace MetadataScraper
                     item.Notes = new List<string>();
 
                     foreach (HtmlNode p in notes_p) {
-                        item.Notes.Add(p.InnerText);
+                        item.Notes.Add(p.InnerText.Replace("&#39;", "'"));
                     }
                 }
 
