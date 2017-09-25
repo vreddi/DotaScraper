@@ -4,6 +4,8 @@ using System.IO;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
+using System.Net;
+using System.Net.Http;
 using Newtonsoft.Json.Serialization;
 using System.Threading;
 
@@ -17,15 +19,19 @@ namespace MetadataScraper
             Formatting = Formatting.Indented
         };
 
-        private static readonly string HeroesMetadataDirectory = @"C:\Repos\DotaBot\Metadata\Heroes\";
+        private static readonly string HeroesMetadataDirectory = @"D:\Github\DotaScraper\";
 
-        private static readonly string HeroesMetadataHeroFormat = @"C:\Repos\DotaBot\Metadata\Heroes\{0}.json";
+        private static readonly string HeroesMetadataHeroFormat = @"D:\Github\DotaScraper\{0}.json";
 
         private static readonly string LuisHeroEntriesPath = @"C:\Repos\DotaBot\Metadata\Luis\HeroEntries.json";
 
         private static readonly string ItemsMetadataItemDirectory = @"D:\Github\Dotabot\Metadata\Items";
 
         private static readonly string ItemsMetadataItemFormat = @"D:\Github\Dotabot\Metadata\Items\{0}.json";
+
+        public static readonly string DotaBuffEndpoint = "https://www.dotabuff.com";
+
+        public static readonly string GamepediaEndpoint = "https://dota2.gamepedia.com";
 
         public static void Main(string[] args)
         {
@@ -38,6 +44,9 @@ namespace MetadataScraper
             ScraperMenu.ShowMenu();
 
             var cmd = Console.ReadLine();
+
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             switch (cmd)
             {
@@ -57,11 +66,17 @@ namespace MetadataScraper
                     await ParseItemData();
                     break;
 
+                case "4":
+                    ParseHeroDataNew();
+                    break;
+
                 default:
                     Console.WriteLine("Could not find anything");
                     break;
             }
 
+            Console.WriteLine("Enter any key to exit...");
+            Console.ReadLine();
             return true;
         }
 
@@ -102,8 +117,21 @@ namespace MetadataScraper
                 Console.Write(item.SourceLink);
             }
 
-            WriteItemFiles(items)
-;        }
+            WriteItemFiles(items);
+        }
+
+        private static void ParseHeroDataNew()
+        {
+            var heros = HeroScraper.ParseAllHeros();
+
+            foreach (var hero in heros)
+            {
+                Console.WriteLine(hero.Name + " processed.");
+                Console.Write(hero.SourceLink);
+            }
+
+            WriteNewHeroFiles(heros);
+        }
 
         private static void WriteHeroFiles(List<OpenDotaHero> heroes)
         {
@@ -118,6 +146,16 @@ namespace MetadataScraper
             foreach (var item in items) {
                 File.WriteAllText(string.Format(ItemsMetadataItemFormat, item.LocalizedName),
                         JsonConvert.SerializeObject(item, jsonSerializerSettings)
+                    );
+            }
+        }
+
+        private static void WriteNewHeroFiles(List<Hero> heros)
+        {
+            foreach (var hero in heros)
+            {
+                File.WriteAllText(string.Format(HeroesMetadataHeroFormat, hero.LocalizedName),
+                        JsonConvert.SerializeObject(hero, jsonSerializerSettings)
                     );
             }
         }
