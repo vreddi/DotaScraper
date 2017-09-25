@@ -106,4 +106,21 @@ public class ProgressBar : IDisposable, IProgress<double>
         }
     }
 
+    /// <summary>
+    /// Starts the progress bar for the amount of time provided
+    /// </summary>
+    /// <param name="milliseconds">Progress bar time</param>
+    public static void StartProgressBar(int milliseconds) {
+        
+        // Show progress bar and add some wait between querying each item document
+        int timeToWait = milliseconds / 100;
+        using (var progress = new ProgressBar())
+        {
+            for (int i = 0; i <= 100; i++)
+            {
+                progress.Report((double)i / 100);
+                Thread.Sleep(timeToWait);
+            }
+        }
+    }
 }

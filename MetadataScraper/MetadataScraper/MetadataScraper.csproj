@@ -51,12 +51,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModels\HeroAttackAnimation.cs" />
+    <Compile Include="DataModels\HeroDistributedStats.cs" />
+    <Compile Include="DataModels\HeroVisionRange.cs" />
     <Compile Include="DataModels\Item.cs" />
     <Compile Include="DataModels\Hero.cs" />
     <Compile Include="DataModels\ItemAbility.cs" />
     <Compile Include="DataModels\ItemShopAvailability.cs" />
+    <Compile Include="DataModels\LanePresenceStats.cs" />
     <Compile Include="DataModels\LuisEntry.cs" />
     <Compile Include="DataModels\OpenDotaHero.cs" />
+    <Compile Include="DataModels\Range.cs" />
     <Compile Include="DataModels\Stat.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -64,7 +69,9 @@
     <Compile Include="DataModels\Skill.cs" />
     <Compile Include="DataModels\StatEffect.cs" />
     <Compile Include="DataModels\Talent.cs" />
+    <Compile Include="Scrapers\HeroScraper.cs" />
     <Compile Include="Tools\ProgressBar.cs" />
+    <Compile Include="Tools\ScraperConsole.cs" />
     <Compile Include="Tools\ScraperMenu.cs" />
   </ItemGroup>
   <ItemGroup>

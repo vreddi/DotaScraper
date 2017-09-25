@@ -17,6 +17,7 @@ namespace MetadataScraper
             Console.WriteLine("1) Parse all hero data");
             Console.WriteLine("2) Generate Luis hero data entries");
             Console.WriteLine("3) Parse all item data");
+            Console.WriteLine("4) [NEW] Parse all hero data");
             Console.ResetColor();
         }
     }
