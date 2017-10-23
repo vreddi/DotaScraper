@@ -82,5 +82,7 @@ namespace MetadataScraper
         public float CollisionSize { get; set; }
 
         public int Legs { get; set; }
+
+        public DateTime LastUpdatedTimeStamp { get; set; }
     }
 }
