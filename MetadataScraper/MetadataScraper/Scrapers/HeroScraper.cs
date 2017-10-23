@@ -19,14 +19,14 @@ namespace MetadataScraper
         private const string DotabuffHeroGridCssClass = "hero-grid";
         private const string DotabuffHeroHeaderContentSecondaryClass = "header-content-secondary";
 
-        // Gamepedia Relevance
+        // Gamepedia relevance
         private const string GamepediaHeroInfoBoxClass = "infobox";
         private const string GamepediaHeroEvenRowsGray = "evenrowsgray";
         private const string GamepediaHeroOddRowsGray = "oddrowsgray";
 
 
         /// <summary>
-        /// 
+        /// Parses all heros from relevant sources to get their indivdual data.
         /// </summary>
         /// <returns>List of heros</returns>
         public static List<Hero> ParseAllHeros() {
@@ -56,6 +56,7 @@ namespace MetadataScraper
                         // Populate Hero Name Info
                         hero.Name = link.SelectSingleNode(".//div[@class = 'name']").InnerText;
                         hero.LocalizedName = heroLocalizedName;
+                        hero.LastUpdatedTimeStamp = DateTime.Now;
 
                         // Free a line after each hero parse
                         Console.WriteLine();
@@ -123,7 +124,7 @@ namespace MetadataScraper
                 ).SelectNodes(".//dd");
 
             hero.SourceLink = path;
-            hero.Popularity = Convert.ToInt16(headerContentSecondaryDl.First().InnerText.Replace("th", ""));
+            hero.Popularity = Convert.ToInt16(headerContentSecondaryDl.First().InnerText.Replace("st", "").Replace("nd", "").Replace("rd", "").Replace("th", ""));
             hero.WinRate = Convert.ToSingle(headerContentSecondaryDl.Last().InnerText.Replace("%", ""));
 
             HeroScraper.ParseDotabuffHeroLanePresence(dotaBuffHeroDocument, hero);

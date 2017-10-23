@@ -19,9 +19,9 @@ namespace MetadataScraper
             Formatting = Formatting.Indented
         };
 
-        private static readonly string HeroesMetadataDirectory = @"D:\Github\DotaScraper\";
+        private static readonly string HeroesMetadataDirectory = @"D:\DotaEntities\Heros\";
 
-        private static readonly string HeroesMetadataHeroFormat = @"D:\Github\DotaScraper\{0}.json";
+        private static readonly string HeroesMetadataHeroFormat = @"D:\DotaEntities\Heros\{0}.json";
 
         private static readonly string LuisHeroEntriesPath = @"C:\Repos\DotaBot\Metadata\Luis\HeroEntries.json";
 
