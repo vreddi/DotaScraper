@@ -6,6 +6,21 @@ using System.Threading.Tasks;
 
 namespace MetadataScraper
 {
+    public enum DamageType {
+        Physical,
+        Magical
+    }
+
+    public enum SkillAbilityType {
+        Passive,
+        PointTarget,
+        UnitTarget
+    }
+
+    public enum AffectsType {
+        EnemyUnits
+    }
+
     [Serializable]
     public class Skill
     {
@@ -19,15 +34,25 @@ namespace MetadataScraper
 
         public string Name { get; set; }
 
-        public string LocalizedName { get; set; }
+        public string HeroLocalizedName { get; set; }
 
-        public int Id { get; set; }
+        public SkillAbilityType AbilityBehavior { get; set; }
+
+        public AffectsType Affects { get; set; }
+
+        public DamageType DamageType { get; set; }
+
+        public Boolean PiercesSpellImunity { get; set; }
+
+        public Boolean Dispellable { get; set; }
+
+        public string Description { get; set; }
+
+        public List<string> Notes { get; set; }
 
         public string Image { get; set; }
 
         public string Link { get; set; }
-
-        public string Description { get; set; }
 
         public List<KeyValuePair<string, string>> Effects { get; set; }
 

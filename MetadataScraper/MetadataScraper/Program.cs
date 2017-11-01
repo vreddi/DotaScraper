@@ -23,6 +23,10 @@ namespace MetadataScraper
 
         private static readonly string HeroesMetadataHeroFormat = @"D:\DotaEntities\Heros\{0}.json";
 
+        private static readonly string SkillsMetadataDirectory = @"D:\DotaEntities\Skills\";
+
+        private static readonly string SkillsMetadataSkillFormat = @"D:\DotaEntities\Skills\{0}.json";
+
         private static readonly string LuisHeroEntriesPath = @"C:\Repos\DotaBot\Metadata\Luis\HeroEntries.json";
 
         private static readonly string ItemsMetadataItemDirectory = @"D:\Github\Dotabot\Metadata\Items";
@@ -32,6 +36,8 @@ namespace MetadataScraper
         public static readonly string DotaBuffEndpoint = "https://www.dotabuff.com";
 
         public static readonly string GamepediaEndpoint = "https://dota2.gamepedia.com";
+
+        public static List<string> LocalHeroCache = new List<string>();
 
         public static void Main(string[] args)
         {
@@ -48,65 +54,45 @@ namespace MetadataScraper
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            switch (cmd)
-            {
-                case "1":
-                    Console.WriteLine("Refresh hero data from DotaBuff? (y/n): ");
-                    cmd = Console.ReadLine();
+            while (cmd != "0") {
+                switch (cmd)
+                {
+                    case "1":
+                        if (Program.LocalHeroCache.Count != 0)
+                        {
+                            Console.WriteLine("Refresh hero data from DotaBuff? (y/n): ");
+                            cmd = Console.ReadLine();
+                        }
 
-                    var refreshData = cmd.Contains("y");
-                    await ParseHeroData(refreshData);
-                    break;
+                        var refreshData = cmd.Contains("y");
+                        await ParseHeroData(refreshData);
+                        break;
 
-                case "2":
-                    await CreateLuisHeroData();
-                    break;
+                    case "2":
+                        break;
 
-                case "3":
-                    await ParseItemData();
-                    break;
+                    case "3":
+                        await ParseItemData();
+                        break;
 
-                case "4":
-                    ParseHeroDataNew();
-                    break;
+                    case "4":
+                        ParseHeroDataNew();
+                        break;
 
-                default:
-                    Console.WriteLine("Could not find anything");
-                    break;
-            }
+                    case "0":
+                        break;
+
+                    default:
+                        Console.WriteLine("Could not find anything");
+                        break;
+                }
+            }         
 
             Console.WriteLine("Enter any key to exit...");
             Console.ReadLine();
             return true;
         }
 
-        private static async Task CreateLuisHeroData()
-        {
-            var heroes = await GetOpenDotaHeroes();
-
-            var luisList = new List<LuisEntry>();
-
-            foreach (var hero in heroes)
-            {
-                var entry = new LuisEntry { canonicalForm = hero.name, list = { hero.localized_name } };
-                if (hero.aliases != null)
-                {
-                    entry.list.AddRange(hero.aliases);
-                }
-
-                luisList.Add(entry);
-            }
-
-            File.WriteAllText(LuisHeroEntriesPath,
-                JsonConvert.SerializeObject(luisList, jsonSerializerSettings));
-        }
-
-        private static async Task ParseHeroData(bool overrideOldData = false)
-        {
-            var heroes = await GetOpenDotaHeroes(overrideOldData);
-
-            WriteHeroFiles(heroes);
-        }
 
         private static async Task ParseItemData(bool overrideOldData = false)
         {
@@ -126,6 +112,7 @@ namespace MetadataScraper
 
             foreach (var hero in heros)
             {
+                Program.LocalHeroCache.Add(hero.LocalizedName);
                 Console.WriteLine(hero.Name + " processed.");
                 Console.Write(hero.SourceLink);
             }
@@ -158,25 +145,6 @@ namespace MetadataScraper
                         JsonConvert.SerializeObject(hero, jsonSerializerSettings)
                     );
             }
-        }
-
-        private static async Task<List<OpenDotaHero>> GetOpenDotaHeroes(bool overrideOldData = false)
-        {
-            var heroes = new List<OpenDotaHero>();
-            var files = Directory.GetFiles(HeroesMetadataDirectory);
-
-            // File exists for all heroes
-            if (files.Length >= 113 && !overrideOldData)
-            {
-                heroes = GetLocalHeroData(files);
-            }
-            else
-            {
-                var oldHeroes = GetLocalHeroData(files);
-                heroes = await Scraper.GetAllHeroes(oldHeroes);
-            }
-
-            return heroes;
         }
 
         private static List<OpenDotaHero> GetLocalHeroData(string[] files)
