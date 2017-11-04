@@ -13,12 +13,13 @@ namespace MetadataScraper
         public Hero() {
 
             this.Health = new HeroDistributedStats<float>();
-            this.HealthRegen = new HeroDistributedStats<float>();
+            this.HealthRegenAmplifier = new HeroDistributedStats<float>();
             this.Mana = new HeroDistributedStats<float>();
-            this.ManaRegen = new HeroDistributedStats<float>();
+            this.ManaRegenAmplifier = new HeroDistributedStats<float>();
             this.Armor = new HeroDistributedStats<float>();
             this.SpellDamage = new HeroDistributedStats<float>();
             this.AttacksPerSecond = new HeroDistributedStats<float>();
+            this.StatusResistance = new HeroDistributedStats<float>();
         }
 
         public int Id { get; set; }
@@ -51,11 +52,11 @@ namespace MetadataScraper
 
         public HeroDistributedStats<float> Health { get; set; }
 
-        public HeroDistributedStats<float> HealthRegen { get; set; }
+        public HeroDistributedStats<float> HealthRegenAmplifier { get; set; }
 
         public HeroDistributedStats<float> Mana { get; set; }
 
-        public HeroDistributedStats<float> ManaRegen { get; set; }
+        public HeroDistributedStats<float> ManaRegenAmplifier { get; set; }
 
         public HeroDistributedStats<Range<float>> Damage { get; set; }
 
@@ -65,7 +66,13 @@ namespace MetadataScraper
 
         public HeroDistributedStats<float> AttacksPerSecond { get; set; }
 
+        public HeroDistributedStats<float> StatusResistance { get; set; }
+
         public int MovementSpeed { get; set; }
+
+        public float BaseHealthRegen { get; set; }
+
+        public float BaseManaRegen { get; set; }
 
         public float TurnRate { get; set; }
 

@@ -208,9 +208,9 @@ namespace MetadataScraper
                     string.Format(".//table[@class = '{0}']", GamepediaHeroEvenRowsGray)
                 );
 
-            HtmlNode heroStatsSet2 = heroInfobBox.SelectSingleNode(
-                    string.Format(".//table[@class = '{0}']", GamepediaHeroOddRowsGray)
-                );
+            HtmlNode heroStatsSet2 = heroInfobBox.SelectNodes(
+                    string.Format(".//table[@class = '{0}']", GamepediaHeroEvenRowsGray)
+                )[1];
 
             HtmlNode a = heroStatsSet1.SelectSingleNode(".//tbody");
 
@@ -219,13 +219,14 @@ namespace MetadataScraper
 
             HeroDistributedStats<float>[] statSet1FillOrder = { 
                     hero.Health,
-                    hero.HealthRegen,
+                    hero.HealthRegenAmplifier,
                     hero.Mana,
-                    hero.ManaRegen,
-                    null,
+                    hero.ManaRegenAmplifier,
                     hero.Armor,
                     hero.SpellDamage,
-                    hero.AttacksPerSecond
+                    hero.AttacksPerSecond,
+                    null,   // Damage
+                    hero.StatusResistance
                 };
 
             for (int i = 1; i < statSet1Rows.Length; ++i) {
@@ -233,7 +234,7 @@ namespace MetadataScraper
 
                 // Have to handle hero.Damage separately
                 // TODO: Handle this case in a better way
-                if (i == 5) {
+                if (i == 8) {
                     string[] damageRange = tds[0].InnerText.Replace("%", "").Split('‒');
                     hero.Damage = new HeroDistributedStats<Range<float>>();
 
@@ -264,29 +265,31 @@ namespace MetadataScraper
                 }
             }
 
-
             // Parse Stat Set 2
             HtmlNode[] statSet2Rows = heroStatsSet2.SelectNodes(".//tr").ToArray();
 
-            hero.MovementSpeed = Convert.ToInt16(statSet2Rows[0].SelectSingleNode(".//td").InnerText);
-            hero.TurnRate = Convert.ToSingle(statSet2Rows[1].SelectSingleNode(".//td").InnerText);
+            hero.BaseHealthRegen = Convert.ToSingle(statSet2Rows[0].SelectSingleNode(".//td").InnerText);
+            hero.BaseManaRegen = Convert.ToSingle(statSet2Rows[1].SelectSingleNode(".//td").InnerText);
+
+            hero.MovementSpeed = Convert.ToInt16(statSet2Rows[2].SelectSingleNode(".//td").InnerText);
+            hero.TurnRate = Convert.ToSingle(statSet2Rows[3].SelectSingleNode(".//td").InnerText);
 
             hero.VisionRange = new HeroVisionRange();
-            hero.VisionRange.Day = Convert.ToInt16(statSet2Rows[2].SelectSingleNode(".//td").InnerText.Split('/')[0]);
-            hero.VisionRange.Night = Convert.ToInt16(statSet2Rows[2].SelectSingleNode(".//td").InnerText.Split('/')[1]);
+            hero.VisionRange.Day = Convert.ToInt16(statSet2Rows[4].SelectSingleNode(".//td").InnerText.Split('/')[0]);
+            hero.VisionRange.Night = Convert.ToInt16(statSet2Rows[4].SelectSingleNode(".//td").InnerText.Split('/')[1]);
 
-            hero.AttackRange = Convert.ToInt16(statSet2Rows[3].SelectSingleNode(".//td").InnerText);
+            hero.AttackRange = Convert.ToInt16(statSet2Rows[5].SelectSingleNode(".//td").InnerText);
 
-            // Projectile Speed is left out for now
+            // Projectile Speed is left out for now (6)
 
             hero.AttackAnimation = new HeroAttackAnimation();
-            hero.AttackAnimation.AttackPoint = Convert.ToSingle(statSet2Rows[5].SelectSingleNode(".//td").InnerText.Split('+')[0]);
-            hero.AttackAnimation.AttackBackSwing = Convert.ToSingle(statSet2Rows[5].SelectSingleNode(".//td").InnerText.Split('+')[1]);
+            hero.AttackAnimation.AttackPoint = Convert.ToSingle(statSet2Rows[7].SelectSingleNode(".//td").InnerText.Split('+')[0]);
+            hero.AttackAnimation.AttackBackSwing = Convert.ToSingle(statSet2Rows[7].SelectSingleNode(".//td").InnerText.Split('+')[1]);
 
-            hero.BaseAttackTime = Convert.ToSingle(statSet2Rows[6].SelectSingleNode(".//td").InnerText);
-            hero.MagicResitance = Convert.ToSingle(statSet2Rows[7].SelectSingleNode(".//td").InnerText.Replace("%", ""));
-            hero.CollisionSize = Convert.ToSingle(statSet2Rows[8].SelectSingleNode(".//td").InnerText);
-            hero.Legs = Convert.ToInt16(statSet2Rows[9].SelectSingleNode(".//td").InnerText);
+            hero.BaseAttackTime = Convert.ToSingle(statSet2Rows[8].SelectSingleNode(".//td").InnerText);
+            hero.MagicResitance = Convert.ToSingle(statSet2Rows[9].SelectSingleNode(".//td").InnerText.Replace("%", ""));
+            hero.CollisionSize = Convert.ToSingle(statSet2Rows[10].SelectSingleNode(".//td").InnerText);
+            hero.Legs = Convert.ToInt16(statSet2Rows[11].SelectSingleNode(".//td").InnerText);
 
             return hero;
         }
