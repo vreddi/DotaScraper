@@ -48,13 +48,14 @@ namespace MetadataScraper
         public static async Task<bool> AsyncMain()
         {
             ScraperMenu.ShowMenu();
-
-            var cmd = Console.ReadLine();
-
+            string cmd = null;
             ServicePointManager.Expect100Continue = true;
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             while (cmd != "0") {
+
+                cmd = Console.ReadLine();
+
                 switch (cmd)
                 {
                     case "1":
@@ -65,7 +66,7 @@ namespace MetadataScraper
                         }
 
                         var refreshData = cmd.Contains("y");
-                        await ParseHeroData(refreshData);
+                        //await ParseHeroData(refreshData);
                         break;
 
                     case "2":
@@ -77,6 +78,15 @@ namespace MetadataScraper
 
                     case "4":
                         ParseHeroDataNew();
+                        break;
+
+                    case "5":
+                        string cmd2 = null;
+                        ScraperMenu.ShowSkillMenu();
+                        while (cmd2 != "4") {
+                            cmd2 = HandleSkillScrapingMenuControl(cmd2);
+                        }
+                        ScraperMenu.ShowMenu();
                         break;
 
                     case "0":
@@ -94,6 +104,50 @@ namespace MetadataScraper
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cmd"></param>
+        private static string HandleSkillScrapingMenuControl(string cmd) {
+
+            cmd = Console.ReadLine();
+
+            switch (cmd) {
+
+                case "1":
+                    Console.WriteLine("Feature Currently unavailable.");
+                    Console.WriteLine("Enter any key to continue...");
+                    Console.ReadLine();
+                    ScraperMenu.ShowSkillMenu();
+                    break;
+
+                case "2":
+                    Console.WriteLine("Feature Currently unavailable.");
+                    Console.WriteLine("Enter any key to continue...");
+                    Console.ReadLine();
+                    ScraperMenu.ShowSkillMenu();
+                    break;
+
+                case "3":
+                    Console.WriteLine("Enter Name of hero (localized)");
+                    string heroName = Console.ReadLine();
+                    Program.ParseSkillData(heroName);
+                    Console.WriteLine("Enter any key to continue...");
+                    Console.ReadLine();
+                    ScraperMenu.ShowSkillMenu();
+                    break;
+
+                case "4":
+                    break;
+
+                default:
+                    Console.WriteLine("Could not find anything");
+                    break;
+            }
+
+            return cmd;
+        }
+
         private static async Task ParseItemData(bool overrideOldData = false)
         {
             var items = await Scraper.GetAllItems();
@@ -104,6 +158,24 @@ namespace MetadataScraper
             }
 
             WriteItemFiles(items);
+        }
+
+        private static void ParseSkillData(string heroLocalizedName = null)
+        {
+            List<Skill> skills = new List<Skill>();
+
+            if (heroLocalizedName != null) {
+                skills = SkillScraper.ScrapeHeroSkills(heroLocalizedName);
+            }
+
+            // TODO: Handle other skill scraping menu cases
+ 
+            foreach (var skill in skills)
+            {
+                Console.WriteLine(skill.Name + " processed.");
+            }
+
+            WriteSkillFiles(skills);
         }
 
         private static void ParseHeroDataNew()
@@ -133,6 +205,14 @@ namespace MetadataScraper
             foreach (var item in items) {
                 File.WriteAllText(string.Format(ItemsMetadataItemFormat, item.LocalizedName),
                         JsonConvert.SerializeObject(item, jsonSerializerSettings)
+                    );
+            }
+        }
+
+        private static void WriteSkillFiles(List<Skill> skills) {
+            foreach (var skill in skills) {
+                File.WriteAllText(string.Format(SkillsMetadataSkillFormat, skill.Name),
+                        JsonConvert.SerializeObject(skill, jsonSerializerSettings)
                     );
             }
         }

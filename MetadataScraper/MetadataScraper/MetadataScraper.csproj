@@ -70,6 +70,7 @@
     <Compile Include="DataModels\StatEffect.cs" />
     <Compile Include="DataModels\Talent.cs" />
     <Compile Include="Scrapers\HeroScraper.cs" />
+    <Compile Include="Scrapers\SkillScraper.cs" />
     <Compile Include="Tools\ProgressBar.cs" />
     <Compile Include="Tools\ScraperConsole.cs" />
     <Compile Include="Tools\ScraperMenu.cs" />
