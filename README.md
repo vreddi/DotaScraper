@@ -1,4 +1,4 @@
-# <img align="left" src="http://i1.img.969g.com/dota2/imgx2013/10/18/258_111015_8c209.gif" width="180px"><div style="margin-left: 100px; padding-top: 12px; font-size: 70px; padding-top: 25px; color: #283593">DotaScraper</div>
+# <img align="left" src="https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/a110f124-0c24-4ec7-ab1e-7a3119650ccb/db10u2p-94d8c6d1-a98c-4373-92d2-a7b167239f80.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcL2ExMTBmMTI0LTBjMjQtNGVjNy1hYjFlLTdhMzExOTY1MGNjYlwvZGIxMHUycC05NGQ4YzZkMS1hOThjLTQzNzMtOTJkMi1hN2IxNjcyMzlmODAuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.PcR1AO753BfeDcJuco-AVzf7BoGcHSx8n_du_U17EgY" width="180px"><div style="margin-left: 100px; padding-top: 12px; font-size: 70px; padding-top: 25px; color: #283593">DotaScraper</div>
 Tool that scrapes Dotabuff to retreive information about Dota.
 <hr>
 
